@@ -70,7 +70,8 @@ def HKLMake(RZDirC,RarVecM,RbrVecM,RcrVecM,
             INhkl,INoOfLacbedPatterns,IMinStrongBeams):
     
     """A temporary function to write to"""
-    RhklTemp=np.zeros((66666,3),dtype="float")
+    """First g is always 0 0 0"""
+    RhklTemp=np.zeros((1,3),dtype="float")
     
     """
     The upper limit for g-vector magnitudes
@@ -89,8 +90,6 @@ def HKLMake(RZDirC,RarVecM,RbrVecM,RcrVecM,
     """The shell increment is the smallest basis vector"""
     RShell=np.min((RarMag,RbrMag,RcrMag))
     
-    """First g is always 0 0 0"""
-    RhklTemp[0,:]=np.zeros(3,dtype="float")
     """Number of reflections in the pool"""
     reflNum=1
     """Number of the shell"""
@@ -108,6 +107,9 @@ def HKLMake(RZDirC,RarVecM,RbrVecM,RcrVecM,
     a=int(np.rint(RgLimit/RarMag))
     b=int(np.rint(RgLimit/RbrMag))
     c=int(np.rint(RgLimit/RcrMag))
+    aArray=np.arange(-a,a)
+    bArray=np.arange(-b,b)
+    cArray=np.arange(-c,c)
     
     """Fill the Rhkl with beams near the Bragg condition"""
     while (reflNum<INhkl and shellNum*RShell<RgLimit):
@@ -119,10 +121,10 @@ def HKLMake(RZDirC,RarVecM,RbrVecM,RcrVecM,
         At the time of writing, the current method
         takes ~2.5 years to run on my laptop...
         """
-        for Ih in range(-a,a-1):
-            for Ik in range(-b,b-1):
-                for Il in range(-c,c-1):
-                    print(Ih,Ik,Il)
+        for Ih in aArray:
+            print(Ih)
+            for Ik in bArray:
+                for Il in cArray:
                     ISel=0
                     """Check that it's allowed by selection rules"""
                     ISel=SelectionRules(SSpaceGroupName,Ih,Ik,Il,ISel)
@@ -139,31 +141,35 @@ def HKLMake(RZDirC,RarVecM,RbrVecM,RcrVecM,
                         RGtestM=(Ih*RarVecM)+(Ik*RbrVecM)+(Il*RcrVecM)
                         RGtestMag=np.sqrt(np.dot(RGtestM,RGtestM))
                         """Is it in the shell?"""
-                        if (RGtestMag>(shellNum-1)*RShell) and (RGtestMag<=shellNum*RShell):
-                            """Is it near a Laue condition |k+g|=|k|"""
-                            RGplusk=RGtestM+Rk
-                            """Divide by |g| to get a measure of
-                            incident beam tilt"""
-                            RDev=np.abs(RElectronWaveVectorMagnitude-np.sqrt(np.dot(RGplusk,RGplusk)))/RGtestMag
-                            """
-                            Tolerance of 0.08 here is rather
-                            arbitrary --> might need revisiting
-                            """
-                            if ((RDev-0.08)<10**-9):
+                        if (RGtestMag>(shellNum-1)*RShell):
+                            if (RGtestMag<=shellNum*RShell):
+                                """Is it near a Laue condition |k+g|=|k|"""
+                                RGplusk=RGtestM+Rk
+                                """Divide by |g| to get a measure of
+                                incident beam tilt"""
+                                RDev=np.abs(RElectronWaveVectorMagnitude-np.sqrt(np.dot(RGplusk,RGplusk)))/RGtestMag
                                 """
-                                Add it to the pool and increment
-                                the counter. Need to check that we
-                                have space in Rhkl because the while
-                                doesn't kick in until we finish the
-                                do loops.
+                                Tolerance of 0.08 here is rather
+                                arbitrary --> might need revisiting
                                 """
-                                reflNum=reflNum+1
-                                RhklTemp.append(RGtest)
+                                if ((RDev-0.08)<10**-9):
+                                    print("Passed all checks")
+                                    print(reflNum)
+                                    """
+                                    Add it to the pool and increment
+                                    the counter. Need to check that we
+                                    have space in Rhkl because the while
+                                    doesn't kick in until we finish the
+                                    do loops.
+                                    """
+                                    reflNum=reflNum+1
+                                    RhklTemp=np.append(RhklTemp,[RGtest],axis=0)
     """Check to make sure we have enough beams"""
     if reflNum<=IMinStrongBeams:
         print("Beam pool is too small, please increase RgLimit. Quiting...")
         IErr=1
         """QUIT PROGRAM"""
+        
     """Make the beam pool"""
     INhkl=reflNum
     print("Using a beam pool of",str(INhkl),"reflections")
