@@ -7,3 +7,9 @@ could be done in a more efficient way, but I have commented the code extensively
 This project is now being completed by myself and Sabe - I will allow him to write about himself so as not to reveal anything he is not comfortable sharing. He has been very helpful, completing more modules/functions whilst I have been more focused on testing/debugging exisiting files. At the time of writing, he has completed the following: image_initialisation_mod, ug_matrix_mod and set_scatter_factors_mod. I need to integrate these into the main code (such as felixrefine) and test it all as a full program - Felix.
 
 If you need to contact me for whatever reason (although Dr Beanland would be the more sensible choice), I can be reached at jacob.g.watkiss@gmail.com.
+
+
+
+I have finished working on Felix as of 29/08/24. At this point, I have completed all functions required to work felixrefine up to and including HKLMake. I had intended to complete more, but did not have time. I have done my best to document as much as possible and every function is commented thoroughly so it should be easy to pick up where I left off. To my knowledge, Dr Beanland will be taking over to finish this project and so should be the point of contact for the future, however I will leave my email here so that if there are any queries you can find me still. I hope that this code treats you well.
+
+-Jacob
